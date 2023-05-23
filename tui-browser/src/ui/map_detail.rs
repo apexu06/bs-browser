@@ -1,14 +1,12 @@
 use crossterm::{
-    cursor::MoveTo,
     event::{self, poll, Event, KeyCode, KeyEventKind},
-    ExecutableCommand,
 };
-use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle, TermLike};
-use log::info;
+use indicatif::{TermLike};
+
 
 use std::{
     error::Error,
-    io::{self, stdout},
+    io::{self},
     time::Duration,
 };
 use tui::{

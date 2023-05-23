@@ -1,6 +1,5 @@
 use serde::Deserialize;
 
-
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Map {
@@ -37,9 +36,12 @@ pub struct Stats {
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Version {
-    pub download_URL: String,
-    pub preview_URL: String,
-    pub cover_URL: String,
+    #[serde(rename(deserialize = "downloadURL"))]
+    pub download_url: String,
+    #[serde(rename(deserialize = "previewURL"))]
+    pub preview_url: String,
+    #[serde(rename(deserialize = "coverURL"))]
+    pub cover_url: String,
     pub diffs: Vec<MapDifficulty>,
     pub hash: String,
 }

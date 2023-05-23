@@ -291,7 +291,7 @@ pub async fn start_details<B: Backend>(
 
     let mut difficulty_table = DifficultyTable::new(map_detail.map.versions[0].diffs.clone());
 
-    let mut preview = match Preview::new(&map_detail.map.versions[0].preview_URL).await {
+    let mut preview = match Preview::new(&map_detail.map.versions[0].preview_url).await {
         Ok(preview) => preview,
         Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e.to_string())),
     };
@@ -551,7 +551,7 @@ fn draw_bottom_left_box<B: Backend>(
                     .add_modifier(Modifier::BOLD)
                     .fg(Color::Cyan),
             ),
-            Span::raw(&map.versions[0].download_URL),
+            Span::raw(&map.versions[0].download_url),
         ]),
         Spans::from(vec![
             Span::styled(
@@ -560,7 +560,7 @@ fn draw_bottom_left_box<B: Backend>(
                     .add_modifier(Modifier::BOLD)
                     .fg(Color::Cyan),
             ),
-            Span::raw(&map.versions[0].cover_URL),
+            Span::raw(&map.versions[0].cover_url),
         ]),
     ];
 

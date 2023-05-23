@@ -1,14 +1,6 @@
-use crossterm::{
-    event::{self, poll, Event, KeyCode, KeyEventKind},
-};
-use indicatif::{TermLike};
+use crossterm::event::{self, poll, Event, KeyCode, KeyEventKind};
 
-
-use std::{
-    error::Error,
-    io::{self},
-    time::Duration,
-};
+use std::{error::Error, io, time::Duration};
 use tui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},

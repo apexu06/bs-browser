@@ -1,0 +1,9 @@
+pre-commit:
+  parallel: true
+  commands:
+      check-gui: 
+        glob: "*.rs"
+        run: cargo check -p gui-browser
+      check-tui: 
+        glob: "*.rs"
+        run: cargo check -p tui-browser

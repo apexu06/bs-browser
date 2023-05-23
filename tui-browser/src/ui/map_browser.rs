@@ -1,14 +1,11 @@
 use std::{
-    io::{self, stdout},
-    time::Duration,
+    io::{self},
 };
 
 use crossterm::{
-    cursor::MoveTo,
     event::{self, Event, KeyCode, KeyEventKind},
-    ExecutableCommand,
 };
-use indicatif::{ProgressBar, ProgressStyle};
+
 use tui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},

@@ -1,16 +1,6 @@
-use crossterm::{
-    cursor::MoveTo,
-    event::{self, poll, Event, KeyCode, KeyEventKind},
-    ExecutableCommand,
-};
-use indicatif::{ProgressBar, ProgressDrawTarget, ProgressStyle, TermLike};
-use log::info;
+use crossterm::event::{self, poll, Event, KeyCode, KeyEventKind};
 
-use std::{
-    error::Error,
-    io::{self, stdout},
-    time::Duration,
-};
+use std::{error::Error, io, time::Duration};
 use tui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},

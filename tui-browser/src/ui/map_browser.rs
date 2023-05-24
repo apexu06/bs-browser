@@ -1,10 +1,7 @@
-use std::{
-    io::{self},
-};
+use std::io::{self};
 
-use crossterm::{
-    event::{self, Event, KeyCode, KeyEventKind},
-};
+use common::{api::beatsaver::fetch_maps, types::map::Map};
+use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 
 use tui::{
     backend::Backend,
@@ -16,7 +13,7 @@ use tui::{
 };
 use unicode_width::UnicodeWidthStr;
 
-use crate::{api::fetch_beatsaver::fetch_maps, types::map_types::Map, utils::loading::Loading};
+use crate::utils::loading::Loading;
 
 use super::map_detail;
 

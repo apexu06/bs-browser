@@ -11,8 +11,6 @@ use simplelog::WriteLogger;
 use tui::{backend::CrosstermBackend, Terminal};
 use ui::map_browser::start_browser;
 
-mod api;
-mod types;
 mod ui;
 mod utils;
 

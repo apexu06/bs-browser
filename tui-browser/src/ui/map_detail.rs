@@ -1,3 +1,13 @@
+use common::{
+    api::{
+        beatsaver::fetch_map_details,
+        scoresaber::{fetch_leaderboard, fetch_leaderboard_info},
+    },
+    types::{
+        map::{Map, MapDifficulty},
+        ss_leaderboard::{LeaderBoardInfo, Score},
+    },
+};
 use crossterm::event::{self, poll, Event, KeyCode, KeyEventKind};
 
 use std::{error::Error, io, time::Duration};
@@ -10,18 +20,10 @@ use tui::{
     Frame, Terminal,
 };
 
-use crate::{
-    api::fetch_beatsaver::fetch_map_details,
-    types::{
-        leaderboard::{LeaderBoardInfo, Score},
-        map_types::MapDifficulty,
-    },
-    utils::loading::Loading,
+use crate::utils::{
+    loading::Loading,
+    preview_player::{Preview, PreviewState},
 };
-use crate::{api::fetch_scoresaber::fetch_leaderboard, types::map_types::Map};
-use crate::{api::fetch_scoresaber::fetch_leaderboard_info, utils::preview_player::PreviewState};
-
-use crate::utils::preview_player::Preview;
 
 #[derive(PartialEq)]
 pub enum MapDetailActiveWindow {

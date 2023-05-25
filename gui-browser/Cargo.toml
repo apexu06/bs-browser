@@ -7,5 +7,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+eframe = "0.22.0"
 egui = "0.22.0"
+egui_extras = {version="0.22.0", features=["svg"]}
+image = { version="0.24.6", features=["jpeg", "png"]}
 tokio = "1.28.1"

@@ -1,9 +1,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use std::{fs::File, io::Read};
+use std::{fs::File, io::Read, ops::Bound};
 
-use eframe::egui;
-use egui::{Context, Id, Ui};
+use eframe::{egui, CreationContext};
+use egui::{Context, FontData, FontDefinitions, FontFamily, Id, Ui};
 use egui_extras::RetainedImage;
 
 static APP_TITLE: &str = "BeatSaber Browser";
@@ -13,12 +13,29 @@ struct App {
     current_window: CurrentWindow,
 }
 
-impl Default for App {
-    fn default() -> Self {
+impl App {
+    fn new(cctx: &CreationContext<'_>) -> Self {
+        setup_custom_font(&cctx.egui_ctx);
         Self {
             current_window: CurrentWindow::Browser(BrowserWindow::default()),
         }
     }
+}
+
+fn setup_custom_font(ctx: &egui::Context) {
+    let mut font = FontDefinitions::default();
+
+    font.font_data.insert(
+        "rubik_regular".to_owned(),
+        FontData::from_static(include_bytes!("../assets/fonts/Rubik-Regular.ttf")),
+    );
+
+    font.families
+        .entry(FontFamily::Proportional)
+        .or_default()
+        .insert(0, "rubik_regular".to_owned());
+
+    ctx.set_fonts(font);
 }
 
 #[allow(dead_code)]
@@ -59,7 +76,7 @@ fn main() -> Result<(), eframe::Error> {
         ..Default::default()
     };
 
-    eframe::run_native(APP_TITLE, options, Box::new(|_cc| Box::<App>::default()))
+    eframe::run_native(APP_TITLE, options, Box::new(|cc| Box::new(App::new(cc))))
 }
 
 #[allow(dead_code)]
@@ -84,6 +101,7 @@ impl eframe::App for App {
                 );
 
                 egui::CentralPanel::default().show(ctx, |ui| {
+                    //ui.heading("BeatSaber Browser");
                     if !window.side_menu.open
                         && ui.button(&window.side_menu.open_button_text).clicked()
                     {

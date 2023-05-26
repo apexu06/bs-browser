@@ -137,8 +137,7 @@ fn main() -> Result<(), eframe::Error> {
 fn draw_settings_bar(ui: &mut Ui, settings_menu: &mut SideMenu) {
     ui.add_space(10.0);
 
-    let close_button = AppButton::Close.build();
-
+    let close_button = BuildWidget::build(AppButton::Close);
     ui.vertical_centered(|ui| {
         if settings_menu.open && ui.add(close_button).clicked() {
             settings_menu.open = false;

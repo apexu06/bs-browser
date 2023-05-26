@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use std::{collections::HashMap, fs::File, io::Read, todo};
+use std::{collections::HashMap, format, fs::File, io::Read, todo};
 
 use eframe::{egui, CreationContext};
 use egui::{
@@ -114,15 +114,9 @@ enum CurrentWindow {
     Settings,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone, PartialEq)]
 struct SideMenu {
     open: bool,
-}
-
-impl Default for SideMenu {
-    fn default() -> Self {
-        Self { open: false }
-    }
 }
 
 fn main() -> Result<(), eframe::Error> {
@@ -184,12 +178,12 @@ fn setup_custom_font(ctx: &egui::Context) {
     ctx.set_fonts(font);
 }
 
-fn get_svg<'a>(img: &'a AppImage) -> &'a Result<RetainedImage, String> {
+fn get_svg(img: &AppImage) -> &Result<RetainedImage, String> {
     IMG_CACHE.get(img).unwrap()
 }
 
 fn load_svg(dbg_id: &str, file_name: &str, size: (u32, u32)) -> Result<RetainedImage, String> {
-    let path = "assets/images/".to_owned() + &file_name;
+    let path = format!("assets/images/{file_name}");
 
     let mut buffer = Vec::new();
     let mut file = File::open(path).map_err(|_e| dbg_id.to_owned())?;

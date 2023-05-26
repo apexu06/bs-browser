@@ -3,8 +3,8 @@
 use std::{fs::File, io::Read};
 
 use eframe::{egui, CreationContext};
-use egui::{Context, FontData, FontDefinitions, FontFamily, Id, Ui};
-use egui_extras::RetainedImage;
+use egui::{Context, FontData, FontDefinitions, FontFamily, Id, ImageButton, Ui};
+use egui_extras::{image::FitTo, RetainedImage};
 
 static APP_TITLE: &str = "BeatSaber Browser";
 
@@ -80,12 +80,15 @@ fn main() -> Result<(), eframe::Error> {
 }
 
 #[allow(dead_code)]
-fn draw_image(ui: &mut Ui, path: String) {
-    let mut buffer = Vec::new();
-    File::open(path).unwrap().read_to_end(&mut buffer).unwrap();
-    let image = RetainedImage::from_svg_bytes("image", &buffer).unwrap();
+fn create_svg(file_name: &str, size: (u32, u32)) -> Result<RetainedImage, String> {
+    let path = "assets/images/".to_owned() + &file_name;
+    let id = "image";
 
-    image.show(ui);
+    let mut buffer = Vec::new();
+    let mut file = File::open(path).map_err(|_e| id)?;
+    file.read_to_end(&mut buffer).map_err(|_e| id)?;
+
+    return RetainedImage::from_svg_bytes_with_size(id, &buffer, FitTo::Size(size.0, size.1));
 }
 
 impl eframe::App for App {
@@ -101,10 +104,10 @@ impl eframe::App for App {
                 );
 
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    //ui.heading("BeatSaber Browser");
-                    if !window.side_menu.open
-                        && ui.button(&window.side_menu.open_button_text).clicked()
-                    {
+                    let settings_img = create_svg("settings-logo.svg", (20, 20)).unwrap();
+                    let button = ImageButton::new(settings_img.texture_id(ctx), (20.0, 20.0));
+
+                    if !window.side_menu.open && ui.add(button).clicked() {
                         window.side_menu.open = true;
                     }
                 });
@@ -127,6 +130,4 @@ fn draw_settings_bar(ui: &mut Ui, settings_menu: &mut SideMenu) {
             ui.label(text);
         }
     });
-
-    // draw_image(ui, "images/settings2-logo.svg".to_string());
 }

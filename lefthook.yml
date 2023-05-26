@@ -7,3 +7,6 @@ pre-commit:
       check-tui: 
         glob: "*.rs"
         run: cargo check -p tui-browser
+      common: 
+        glob: "*.rs"
+        run: cargo check -p common

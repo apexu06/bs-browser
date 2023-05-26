@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use std::{collections::HashMap, fs::File, io::Read};
+use std::{collections::HashMap, fs::File, io::Read, todo};
 
 use eframe::{egui, CreationContext};
 use egui::{
@@ -19,6 +19,13 @@ static FONT: &str = "rubik_regular";
 static APP_TITLE: &str = "BeatSaber Browser";
 
 lazy_static! {
+    static ref SIDE_MENU_ITEMS: Vec<(String, CurrentWindow)> = {
+        vec![
+            ("Browser".to_owned(), CurrentWindow::Browser),
+            ("Maps".to_owned(), CurrentWindow::MapDetail),
+            ("Settings".to_owned(), CurrentWindow::Settings),
+        ]
+    };
     static ref IMG_CACHE: HashMap<AppImage, Result<RetainedImage, String>> = {
         let mut map = HashMap::new();
         map.insert(
@@ -32,6 +39,7 @@ lazy_static! {
 
 struct App {
     current_window: CurrentWindow,
+    side_menu: SideMenu,
 }
 
 impl App {
@@ -39,7 +47,8 @@ impl App {
         setup_custom_font(&cctx.egui_ctx);
 
         Self {
-            current_window: CurrentWindow::Browser(BrowserWindow::default()),
+            current_window: CurrentWindow::Browser,
+            side_menu: SideMenu::default(),
         }
     }
 }
@@ -47,12 +56,12 @@ impl App {
 impl eframe::App for App {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         match &mut self.current_window {
-            CurrentWindow::Browser(window) => {
+            CurrentWindow::Browser => {
                 egui::SidePanel::left(Id::new("side_menu")).show_animated(
                     ctx,
-                    window.side_menu.open,
+                    self.side_menu.open,
                     |ui| {
-                        draw_settings_bar(ui, &mut window.side_menu);
+                        draw_settings_bar(ui, self);
                     },
                 );
 
@@ -65,7 +74,7 @@ impl eframe::App for App {
                         );
                     });
 
-                    let clicked = !window.side_menu.open
+                    let clicked = !self.side_menu.open
                         && match get_svg(&AppImage::SideMenu) {
                             Ok(img) => ui
                                 .add(ImageButton::new(img.texture_id(ctx), img.size_vec2()))
@@ -73,28 +82,15 @@ impl eframe::App for App {
                             Err(fallback_text) => ui.add(Button::new(fallback_text)).clicked(),
                         };
 
-                    if !window.side_menu.open && clicked {
-                        window.side_menu.open = true;
+                    if !self.side_menu.open && clicked {
+                        self.side_menu.open = true;
                     }
                 });
             }
-            CurrentWindow::Settings => {}
-            CurrentWindow::MapDetail => {}
+            CurrentWindow::Settings => todo!("add settings screen"),
+            CurrentWindow::MapDetail => todo!("add map details screen"),
         }
     }
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-enum CurrentWindow {
-    Browser(BrowserWindow),
-    MapDetail,
-    Settings,
-}
-
-#[derive(Debug, Default)]
-struct BrowserWindow {
-    side_menu: SideMenu,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -110,18 +106,22 @@ impl AppImage {
     }
 }
 
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+enum CurrentWindow {
+    Browser,
+    MapDetail,
+    Settings,
+}
+
 #[derive(Debug)]
 struct SideMenu {
     open: bool,
-    menu_button_texts: Vec<String>,
 }
 
 impl Default for SideMenu {
     fn default() -> Self {
-        Self {
-            open: false,
-            menu_button_texts: vec!["Maps".to_owned(), "Details".to_owned()],
-        }
+        Self { open: false }
     }
 }
 
@@ -134,19 +134,22 @@ fn main() -> Result<(), eframe::Error> {
     eframe::run_native(APP_TITLE, options, Box::new(|cc| Box::new(App::new(cc))))
 }
 
-fn draw_settings_bar(ui: &mut Ui, settings_menu: &mut SideMenu) {
-    ui.add_space(10.0);
+fn draw_settings_bar(ui: &mut Ui, app: &mut App) {
+    let side_menu = &mut app.side_menu;
+    let close_button = AppButton::Close.build();
 
-    let close_button = BuildWidget::build(AppButton::Close);
+    ui.add_space(10.0);
     ui.vertical_centered(|ui| {
-        if settings_menu.open && ui.add(close_button).clicked() {
-            settings_menu.open = false;
+        if side_menu.open && ui.add(close_button).clicked() {
+            side_menu.open = false;
         }
 
         ui.separator();
 
-        for text in &settings_menu.menu_button_texts {
-            ui.label(RichText::new(text).text_style(TextStyle::Body));
+        for (text, window) in SIDE_MENU_ITEMS.iter() {
+            if ui.add(AppButton::Subtle(text.to_owned()).build()).clicked() {
+                app.current_window = window.clone();
+            }
             ui.add_space(10.0);
         }
     });

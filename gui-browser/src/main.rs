@@ -55,9 +55,7 @@ impl eframe::App for App {
 
                 egui::CentralPanel::default().show(ctx, |ui| {
                     ui.vertical_centered(|ui| {
-                        ui.heading(
-                            RichText::new("BeatSaber Browser").text_style(TextStyle::Heading),
-                        );
+                        ui.heading(RichText::new(APP_TITLE).text_style(TextStyle::Heading));
                     });
 
                     let clicked = !window.side_menu.open

@@ -4,11 +4,14 @@ use std::{collections::HashMap, fs::File, io::Read};
 
 use eframe::{egui, CreationContext};
 use egui::{
-    Button, Context, FontData, FontDefinitions, FontFamily, FontId, Id, ImageButton, RichText,
-    TextStyle, Ui,
+    Button, Color32, Context, FontData, FontDefinitions, FontFamily, FontId, Id, ImageButton,
+    RichText, Stroke, TextStyle, Ui,
 };
 use egui_extras::{image::FitTo, RetainedImage};
 use lazy_static::lazy_static;
+use utils::button::AppButton;
+
+mod utils;
 
 // add to App struct if we want to be able to change the font at runtime
 static FONT: &str = "rubik_regular";
@@ -20,7 +23,7 @@ lazy_static! {
         let mut map = HashMap::new();
         map.insert(
             AppImage::SideMenu,
-            load_svg(&AppImage::SideMenu.dbg_id(), "settings-logo.svg", (20, 20)),
+            load_svg(&AppImage::SideMenu.dbg_id(), "settings-logo.svg", (30, 30)),
         );
 
         map
@@ -55,13 +58,17 @@ impl eframe::App for App {
 
                 egui::CentralPanel::default().show(ctx, |ui| {
                     ui.vertical_centered(|ui| {
-                        ui.heading(RichText::new(APP_TITLE).text_style(TextStyle::Heading));
+                        ui.heading(
+                            RichText::new(APP_TITLE)
+                                .color(Color32::from_rgb(255, 255, 255))
+                                .text_style(TextStyle::Heading),
+                        );
                     });
 
                     let clicked = !window.side_menu.open
                         && match get_svg(&AppImage::SideMenu) {
                             Ok(img) => ui
-                                .add(ImageButton::new(img.texture_id(ctx), (20.0, 20.0)))
+                                .add(ImageButton::new(img.texture_id(ctx), img.size_vec2()))
                                 .clicked(),
                             Err(fallback_text) => ui.add(Button::new(fallback_text)).clicked(),
                         };
@@ -130,15 +137,20 @@ fn main() -> Result<(), eframe::Error> {
 }
 
 fn draw_settings_bar(ui: &mut Ui, settings_menu: &mut SideMenu) {
+    ui.add_space(10.0);
+
+    let close_button = AppButton::close_button();
+
     ui.vertical_centered(|ui| {
-        if settings_menu.open && ui.button(&settings_menu.close_button_text).clicked() {
+        if settings_menu.open && ui.add(close_button.into::<egui::Button>()).clicked() {
             settings_menu.open = false;
         }
 
         ui.separator();
 
         for text in &settings_menu.menu_button_texts {
-            ui.label(text);
+            ui.label(RichText::new(text).text_style(TextStyle::Body));
+            ui.add_space(10.0);
         }
     });
 }
@@ -154,7 +166,7 @@ fn setup_custom_font(ctx: &egui::Context) {
         (Heading, FontId::new(40.0, Proportional)),
         (Body, FontId::new(18.0, Proportional)),
         (Small, FontId::new(12.0, Proportional)),
-        (Button, FontId::new(18.0, Proportional)),
+        (Button, FontId::new(20.0, Proportional)),
     ]
     .into();
     ctx.set_style(style);

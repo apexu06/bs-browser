@@ -3,7 +3,7 @@
 use std::{fs::File, io::Read};
 
 use eframe::{egui, CreationContext};
-use egui::{Context, FontData, FontDefinitions, FontFamily, Id, ImageButton, Ui};
+use egui::{Button, Context, FontData, FontDefinitions, FontFamily, Id, ImageButton, Ui};
 use egui_extras::{image::FitTo, RetainedImage};
 
 static APP_TITLE: &str = "BeatSaber Browser";
@@ -54,7 +54,7 @@ struct BrowserWindow {
 #[derive(Debug)]
 struct SideMenu {
     open: bool,
-    open_button_text: String,
+    open_button_image_path: String,
     close_button_text: String,
     menu_button_texts: Vec<String>,
 }
@@ -63,7 +63,7 @@ impl Default for SideMenu {
     fn default() -> Self {
         Self {
             open: false,
-            open_button_text: "Menu".to_owned(),
+            open_button_image_path: "settings-logo.svg".to_owned(),
             close_button_text: "Close".to_owned(),
             menu_button_texts: vec!["Maps".to_owned(), "Details".to_owned()],
         }
@@ -104,10 +104,15 @@ impl eframe::App for App {
                 );
 
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    let settings_img = create_svg("settings-logo.svg", (20, 20)).unwrap();
-                    let button = ImageButton::new(settings_img.texture_id(ctx), (20.0, 20.0));
+                    let clicked =
+                        match create_svg(&window.side_menu.open_button_image_path, (20, 20)) {
+                            Ok(img) => ui
+                                .add(ImageButton::new(img.texture_id(ctx), (20.0, 20.0)))
+                                .clicked(),
+                            Err(fallback_text) => ui.add(Button::new(fallback_text)).clicked(),
+                        };
 
-                    if !window.side_menu.open && ui.add(button).clicked() {
+                    if !window.side_menu.open && clicked {
                         window.side_menu.open = true;
                     }
                 });

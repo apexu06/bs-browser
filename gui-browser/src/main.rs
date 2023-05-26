@@ -5,11 +5,11 @@ use std::{collections::HashMap, fs::File, io::Read};
 use eframe::{egui, CreationContext};
 use egui::{
     Button, Color32, Context, FontData, FontDefinitions, FontFamily, FontId, Id, ImageButton,
-    RichText, Stroke, TextStyle, Ui,
+    RichText, TextStyle, Ui,
 };
 use egui_extras::{image::FitTo, RetainedImage};
 use lazy_static::lazy_static;
-use utils::button::AppButton;
+use utils::ui::{build_widget::BuildWidget, button::AppButton};
 
 mod utils;
 
@@ -113,7 +113,6 @@ impl AppImage {
 #[derive(Debug)]
 struct SideMenu {
     open: bool,
-    close_button_text: String,
     menu_button_texts: Vec<String>,
 }
 
@@ -121,7 +120,6 @@ impl Default for SideMenu {
     fn default() -> Self {
         Self {
             open: false,
-            close_button_text: "Close".to_owned(),
             menu_button_texts: vec!["Maps".to_owned(), "Details".to_owned()],
         }
     }
@@ -139,10 +137,10 @@ fn main() -> Result<(), eframe::Error> {
 fn draw_settings_bar(ui: &mut Ui, settings_menu: &mut SideMenu) {
     ui.add_space(10.0);
 
-    let close_button = AppButton::close_button();
+    let close_button = AppButton::Close.build();
 
     ui.vertical_centered(|ui| {
-        if settings_menu.open && ui.add(close_button.into::<egui::Button>()).clicked() {
+        if settings_menu.open && ui.add(close_button).clicked() {
             settings_menu.open = false;
         }
 

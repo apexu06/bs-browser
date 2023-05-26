@@ -3,7 +3,10 @@
 use std::{fs::File, io::Read};
 
 use eframe::{egui, CreationContext};
-use egui::{Context, FontData, FontDefinitions, FontFamily, Id, ImageButton, Ui};
+use egui::{
+    Context, FontData, FontDefinitions, FontFamily, FontId, Id, ImageButton, RichText, TextStyle,
+    Ui,
+};
 use egui_extras::{image::FitTo, RetainedImage};
 
 static APP_TITLE: &str = "BeatSaber Browser";
@@ -23,7 +26,20 @@ impl App {
 }
 
 fn setup_custom_font(ctx: &egui::Context) {
+    use egui::TextStyle::*;
+    use FontFamily::Proportional;
+
     let mut font = FontDefinitions::default();
+    let mut style = (*ctx.style()).clone();
+
+    style.text_styles = [
+        (Heading, FontId::new(40.0, Proportional)),
+        (Body, FontId::new(18.0, Proportional)),
+        (Small, FontId::new(12.0, Proportional)),
+        (Button, FontId::new(18.0, Proportional)),
+    ]
+    .into();
+    ctx.set_style(style);
 
     font.font_data.insert(
         "rubik_regular".to_owned(),
@@ -54,7 +70,6 @@ struct BrowserWindow {
 #[derive(Debug)]
 struct SideMenu {
     open: bool,
-    open_button_text: String,
     close_button_text: String,
     menu_button_texts: Vec<String>,
 }
@@ -63,7 +78,6 @@ impl Default for SideMenu {
     fn default() -> Self {
         Self {
             open: false,
-            open_button_text: "Menu".to_owned(),
             close_button_text: "Close".to_owned(),
             menu_button_texts: vec!["Maps".to_owned(), "Details".to_owned()],
         }
@@ -104,6 +118,11 @@ impl eframe::App for App {
                 );
 
                 egui::CentralPanel::default().show(ctx, |ui| {
+                    ui.vertical_centered(|ui| {
+                        ui.heading(
+                            RichText::new("BeatSaber Browser").text_style(TextStyle::Heading),
+                        );
+                    });
                     let settings_img = create_svg("settings-logo.svg", (20, 20)).unwrap();
                     let button = ImageButton::new(settings_img.texture_id(ctx), (20.0, 20.0));
 

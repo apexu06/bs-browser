@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use std::{collections::HashMap, format, fs::File, io::Read, todo};
+use std::{collections::HashMap, fmt::Display, format, fs::File, io::Read, todo};
 
 use eframe::{egui, CreationContext};
 use egui::{
@@ -19,11 +19,11 @@ static FONT: &str = "rubik_regular";
 static APP_TITLE: &str = "BeatSaber Browser";
 
 lazy_static! {
-    static ref SIDE_MENU_ITEMS: Vec<(String, CurrentWindow)> = {
+    static ref SIDE_MENU_ITEMS: Vec<CurrentWindow> = {
         vec![
-            ("Browser".to_owned(), CurrentWindow::Browser),
-            ("Maps".to_owned(), CurrentWindow::MapDetail),
-            ("Settings".to_owned(), CurrentWindow::Settings),
+            (CurrentWindow::Browser),
+            (CurrentWindow::MapDetail),
+            (CurrentWindow::Settings),
         ]
     };
     static ref IMG_CACHE: HashMap<AppImage, Result<RetainedImage, String>> = {
@@ -114,6 +114,18 @@ enum CurrentWindow {
     Settings,
 }
 
+impl Display for CurrentWindow {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match self {
+            CurrentWindow::Browser => "Browser",
+            CurrentWindow::MapDetail => "Map Details",
+            CurrentWindow::Settings => "Settings",
+        };
+
+        write!(f, "{str}")
+    }
+}
+
 #[derive(Debug, Default, Clone, PartialEq)]
 struct SideMenu {
     open: bool,
@@ -140,8 +152,11 @@ fn draw_settings_bar(ui: &mut Ui, app: &mut App) {
 
         ui.separator();
 
-        for (text, window) in SIDE_MENU_ITEMS.iter() {
-            if ui.add(AppButton::Subtle(text.to_owned()).build()).clicked() {
+        for window in SIDE_MENU_ITEMS.iter() {
+            if ui
+                .add(AppButton::Subtle(format!("{window}")).build())
+                .clicked()
+            {
                 app.current_window = window.clone();
             }
             ui.add_space(10.0);

@@ -1,4 +1,4 @@
-use std::io::{self};
+use std::io;
 
 use common::{api::beatsaver::fetch_maps, types::map::Map};
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
@@ -143,7 +143,7 @@ pub async fn start_browser<B: Backend>(terminal: &mut Terminal<B>) -> Result<(),
                             browser.input.clear();
                         }
                         KeyCode::Char('F') => {
-                            if browser.filtered_results.len() == 0 {
+                            if browser.filtered_results.is_empty() {
                                 continue;
                             }
 
@@ -164,7 +164,7 @@ pub async fn start_browser<B: Backend>(terminal: &mut Terminal<B>) -> Result<(),
                         KeyCode::Down => browser.next_item(),
                         KeyCode::Up => browser.previous_item(),
                         KeyCode::Enter => {
-                            if browser.filtered_results.len() == 0 {
+                            if browser.filtered_results.is_empty() {
                                 continue;
                             }
                             let selected = browser.table_state.selected().unwrap_or(0);
@@ -225,7 +225,7 @@ pub async fn start_browser<B: Backend>(terminal: &mut Terminal<B>) -> Result<(),
                         KeyCode::Down => browser.next_item(),
                         KeyCode::Up => browser.previous_item(),
                         KeyCode::Enter => {
-                            if browser.filtered_results.len() == 0 {
+                            if browser.filtered_results.is_empty() {
                                 continue;
                             }
                             let selected = browser.table_state.selected().unwrap_or(0);
@@ -288,7 +288,7 @@ fn draw_browser<B: Backend>(frame: &mut Frame<B>, browser: &mut Browser) {
                 Span::raw("Exit(q) "),
                 Span::raw("Search(s) "),
                 Span::raw("Sort(S) "),
-                Span::raw(if browser.results.len() != 0 {
+                Span::raw(if !browser.results.is_empty() {
                     "Fetch more(F) "
                 } else {
                     ""
@@ -430,7 +430,7 @@ fn filter_results(browser: &mut Browser, filter: &str) {
     browser.filtered_results = filtered_results;
 }
 
-fn display_maps(maps: &Vec<Map>) -> Table<'static> {
+fn display_maps(maps: &[Map]) -> Table<'static> {
     let header = Row::new(vec![
         Cell::from("ID"),
         Cell::from("SONG NAME"),
@@ -448,14 +448,17 @@ fn display_maps(maps: &Vec<Map>) -> Table<'static> {
         .iter()
         .map(|m| {
             Row::new(vec![
-                Cell::from(format!("{}", m.id)),
-                Cell::from(format!("{}", m.metadata.song_name)),
-                Cell::from(format!("{}", m.metadata.song_author_name)),
-                Cell::from(format!("{}", m.metadata.level_author_name)),
-                Cell::from(format!(
-                    "{}",
-                    m.last_published_at.split("T").next().unwrap_or("")
-                )),
+                Cell::from(m.id.to_owned()),
+                Cell::from(m.metadata.song_name.to_owned()),
+                Cell::from(m.metadata.song_author_name.to_owned()),
+                Cell::from(m.metadata.level_author_name.to_owned()),
+                Cell::from(
+                    m.last_published_at
+                        .split('T')
+                        .next()
+                        .unwrap_or("")
+                        .to_owned(),
+                ),
             ])
         })
         .collect();

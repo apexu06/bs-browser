@@ -135,7 +135,7 @@ impl SSLeaderboard {
 
         for diff in &map.versions[0].diffs {
             if diff.characteristic == "Lightshow" {
-                leaderboard_diffs.push(LeaderBoardInfo::new());
+                leaderboard_diffs.push(LeaderBoardInfo::default());
                 continue;
             }
 
@@ -170,12 +170,10 @@ impl SSLeaderboard {
                 leaderboard_diffs,
                 current_leaderboard_index: 0,
             }),
-            Err(_) => {
-                return Err(Box::new(io::Error::new(
-                    io::ErrorKind::Other,
-                    format!("Failed to fetch scores"),
-                )))
-            }
+            Err(_) => Err(Box::new(io::Error::new(
+                io::ErrorKind::Other,
+                "Failed to fetch scores".to_owned(),
+            ))),
         }
     }
 
@@ -225,17 +223,14 @@ impl SSLeaderboard {
         let diff_id = self.leaderboard_diffs[index].id as u32;
         let response = fetch_leaderboard(diff_id, page).await;
 
-        match response {
-            Ok(mut scores) => {
-                self.scores.append(&mut scores);
-            }
-            Err(_) => {}
+        if let Ok(mut scores) = response {
+            self.scores.append(&mut scores);
         }
     }
 }
 
-fn get_difficulty_color(difficulty: &String) -> Color {
-    match difficulty.as_str() {
+fn get_difficulty_color(difficulty: &str) -> Color {
+    match difficulty {
         "Easy" => Color::Green,
         "Normal" => Color::Blue,
         "Hard" => Color::Rgb(255, 99, 71),
@@ -246,14 +241,14 @@ fn get_difficulty_color(difficulty: &String) -> Color {
 }
 
 fn get_diff_id(diff: &str) -> u8 {
-    return match diff {
+    match diff {
         "Easy" => 1,
         "Normal" => 3,
         "Hard" => 5,
         "Expert" => 7,
         "ExpertPlus" => 9,
         _ => 0,
-    };
+    }
 }
 
 fn get_diff_name(diff_id: u8) -> String {
@@ -323,10 +318,11 @@ pub async fn start_details<B: Backend>(
             if let Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
                     match preview.state {
-                        PreviewState::Paused => match key.code {
-                            KeyCode::Char('r') => preview.resume(),
-                            _ => {}
-                        },
+                        PreviewState::Paused => {
+                            if let KeyCode::Char('r') = key.code {
+                                preview.resume();
+                            }
+                        }
 
                         PreviewState::Playing => match key.code {
                             KeyCode::Char('s') => preview.stop(),
@@ -453,7 +449,7 @@ fn draw_details<B: Backend>(
         frame,
         map_detail,
         difficulty_table,
-        &leaderboard,
+        leaderboard,
         left_boxes[2],
     );
 }
@@ -490,7 +486,7 @@ fn draw_leaderboard<B: Backend>(
         .map(|score| {
             Row::new(vec![
                 Cell::from(format!("{}", score.rank)),
-                Cell::from(format!("{}", score.leaderboard_player_info.name)),
+                Cell::from(score.leaderboard_player_info.name.to_owned()),
                 Cell::from(format!(
                     "{:.2}%",
                     (score.base_score as f32 / leaderboard.max_score as f32) * 100.0
@@ -690,7 +686,7 @@ fn draw_top_left_box<B: Backend>(frame: &mut Frame<B>, map: &Map, top_box: Rect)
             Span::raw(format!(
                 "{: >box_width$}",
                 truncate(
-                    &map.last_published_at.split("T").collect::<Vec<&str>>()[0],
+                    map.last_published_at.split('T').collect::<Vec<_>>()[0],
                     box_width
                 ),
             )),

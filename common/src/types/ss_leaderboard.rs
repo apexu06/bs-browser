@@ -10,8 +10,8 @@ pub struct LeaderBoardInfo {
     pub difficulty: Difficulty,
 }
 
-impl LeaderBoardInfo {
-    pub fn new() -> LeaderBoardInfo {
+impl Default for LeaderBoardInfo {
+    fn default() -> LeaderBoardInfo {
         LeaderBoardInfo {
             id: 0,
             max_score: 0,

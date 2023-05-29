@@ -1,12 +1,22 @@
 pre-commit:
   parallel: true
   commands:
-      check-gui: 
+      check-gui:
         glob: "*.rs"
         run: cargo check -p gui-browser
-      check-tui: 
+      check-tui:
         glob: "*.rs"
         run: cargo check -p tui-browser
-      common: 
+      check-common:
         glob: "*.rs"
         run: cargo check -p common
+
+      lint-gui:
+        glob: "*.rs"
+        run: cargo clippy -p gui-browser
+      lint-tui:
+        glob: "*.rs"
+        run: cargo clippy -p tui-browser
+      lin-common:
+        glob: "*.rs"
+        run: cargo clippy -p common

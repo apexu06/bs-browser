@@ -17,6 +17,6 @@ pre-commit:
       lint-tui:
         glob: "*.rs"
         run: cargo clippy -p tui-browser
-      lin-common:
+      lint-common:
         glob: "*.rs"
         run: cargo clippy -p common

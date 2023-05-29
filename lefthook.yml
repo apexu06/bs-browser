@@ -13,10 +13,10 @@ pre-commit:
 
       lint-gui:
         glob: "*.rs"
-        run: cargo clippy -p gui-browser
+        run: cargo clippy -p gui-browser -- -D clippy::all
       lint-tui:
         glob: "*.rs"
-        run: cargo clippy -p tui-browser
+        run: cargo clippy -p tui-browser -- -D clippy::all
       lint-common:
         glob: "*.rs"
-        run: cargo clippy -p common
+        run: cargo clippy -p common -- -D clippy::all
